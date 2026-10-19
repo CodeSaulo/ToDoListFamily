@@ -285,3 +285,31 @@ export async function resetPassword(_: ActionState, fd: FormData): Promise<Actio
   if (error) return { error: friendly(error.message) };
   return { ok: "Contraseña cambiada. Ya puede entrar con la nueva." };
 }
+
+// ============ Obligaciones ============
+
+export async function saveObligation(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const title = str(fd, "title");
+  if (!title) return { error: "Escribe la obligación." };
+  const { count } = await supabase.from("obligations").select("id", { count: "exact", head: true });
+  const { error } = await supabase
+    .from("obligations")
+    .insert({ title, description: str(fd, "description") || null, position: count ?? 0 });
+  return done(error, "Obligación agregada");
+}
+
+export async function deleteObligation(id: string): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("obligations").delete().eq("id", id);
+  return done(error, "Obligación borrada");
+}
+
+export async function shiftRotation(delta: number): Promise<ActionState> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("settings").select("value").eq("key", "rotacion_offset").maybeSingle();
+  const { error } = await supabase
+    .from("settings")
+    .upsert({ key: "rotacion_offset", value: Number(data?.value ?? 0) + delta });
+  return done(error, "Rol ajustado");
+}

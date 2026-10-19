@@ -1,6 +1,7 @@
 import { CookingPot, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions";
+import { ObligationsCard } from "@/components/ObligationsCard";
 import { TaskCard } from "@/components/TaskCard";
 import { Avatar, Card, Empty, IconTile, IconTitle } from "@/components/ui";
 import {
@@ -114,6 +115,8 @@ export default async function Home() {
           )}
         </Card>
       )}
+
+      <ObligationsCard />
 
       <Card title={<IconTitle icon={Users} className="text-fuchsia-600">La familia hoy</IconTitle>} action={<Link href="/tareas" className="text-sm font-bold text-brand-700">Tareas <ChevronRight size={14} className="inline" /></Link>}>
         <div className="space-y-3">

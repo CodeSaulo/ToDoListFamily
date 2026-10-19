@@ -42,3 +42,15 @@ export function formatDate(day: string): string {
     new Date(`${day}T12:00:00Z`),
   );
 }
+
+/** Lunes de la semana de `day`. */
+export function mondayOf(day: string): string {
+  const dow = weekdayOf(day);
+  return addDays(day, dow === 0 ? -6 : 1 - dow);
+}
+
+/** Semanas completas desde el lunes 5 de enero de 2026 (referencia fija del rol). */
+export function weekNumber(day: string): number {
+  const ms = new Date(`${mondayOf(day)}T12:00:00Z`).getTime() - new Date("2026-01-05T12:00:00Z").getTime();
+  return Math.round(ms / (7 * 86400000));
+}

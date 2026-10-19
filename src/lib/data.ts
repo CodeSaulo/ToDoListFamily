@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Announcement, DebtEntry, DishEntry, Profile, TaskInstance } from "@/lib/types";
-import { weekdayOf } from "@/lib/dates";
+import type { Announcement, DebtEntry, DishEntry, Obligation, Profile, TaskInstance } from "@/lib/types";
+import { weekNumber, weekdayOf } from "@/lib/dates";
 
 export const getSession = cache(async () => {
   const supabase = await createClient();
@@ -105,3 +105,23 @@ export async function getTarifaBloque(): Promise<number> {
 
 export const money = (n: number) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+
+/** Quién tiene cada obligación en la semana de `day`. */
+export async function getRotation(day: string) {
+  const { supabase, hijas } = await getSession();
+  const [{ data }, { data: off }] = await Promise.all([
+    supabase.from("obligations").select("*").eq("active", true).order("position").order("created_at"),
+    supabase.from("settings").select("value").eq("key", "rotacion_offset").maybeSingle(),
+  ]);
+  const obligations = (data ?? []) as Obligation[];
+  const order = [...hijas].sort((a, b) => a.name.localeCompare(b.name));
+  const shift = weekNumber(day) + Number(off?.value ?? 0);
+  const n = order.length;
+  return {
+    offset: Number(off?.value ?? 0),
+    rows: obligations.map((o, i) => ({
+      obligation: o,
+      hija: n ? order[(((i + shift) % n) + n) % n] : undefined,
+    })),
+  };
+}

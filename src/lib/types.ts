@@ -93,3 +93,11 @@ export const DISH_KIND_LABEL: Record<DishEntry["kind"], string> = {
   tarea_extra: "Tarea extra",
   pagada: "Lavó una tanda",
 };
+
+export type Obligation = {
+  id: string;
+  title: string;
+  description: string | null;
+  position: number;
+  active: boolean;
+};
