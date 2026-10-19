@@ -1,7 +1,8 @@
+import { KeyRound, Users } from "lucide-react";
 import { redirect } from "next/navigation";
 import { resetPassword, saveMember } from "@/app/actions";
 import { ActionForm, SubmitButton } from "@/components/forms";
-import { Card, PageTitle } from "@/components/ui";
+import { Card, IconTitle, PageTitle } from "@/components/ui";
 import { getSession } from "@/lib/data";
 
 type Member = { email: string; name: string; nickname: string | null; role: string; color: string };
@@ -15,7 +16,7 @@ export default async function FamiliaPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Solo estos correos pueden crear cuenta">Familia</PageTitle>
+      <PageTitle sub="Solo estos correos pueden crear cuenta" icon={Users} tone="pink">Familia</PageTitle>
       <Card>
         <ul className="divide-y divide-slate-100">
           {members.map((m) => (
@@ -36,7 +37,7 @@ export default async function FamiliaPage() {
           ))}
         </ul>
       </Card>
-      <Card title="🔑 Cambiar contraseña">
+      <Card title={<IconTitle icon={KeyRound}>Cambiar contraseña</IconTitle>}>
         <p className="mb-3 text-sm text-slate-500">Si a alguien se le olvidó, ponle una nueva aquí y díselo para que entre.</p>
         <ActionForm action={resetPassword}>
           <select name="email" className="input">

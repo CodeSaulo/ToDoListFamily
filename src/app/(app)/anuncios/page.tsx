@@ -1,3 +1,4 @@
+import { Megaphone } from "lucide-react";
 import { redirect } from "next/navigation";
 import { addAnnouncement, deleteAnnouncement } from "@/app/actions";
 import { ActButton, ActionForm, SubmitButton } from "@/components/forms";
@@ -20,7 +21,7 @@ export default async function AnunciosPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Salen hasta arriba en el inicio de todos">Anuncios 📣</PageTitle>
+      <PageTitle sub="Salen hasta arriba en el inicio de todos" icon={Megaphone} tone="orange">Anuncios</PageTitle>
       <Card title="Nuevo anuncio">
         <ActionForm action={addAnnouncement}>
           <input name="body" className="input" placeholder="Ej. Hoy tenemos reunión" />

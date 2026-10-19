@@ -1,14 +1,15 @@
 "use client";
 
+import { House, ListChecks, CookingPot, Wallet, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ITEMS = [
-  { href: "/", label: "Inicio", icon: "🏠" },
-  { href: "/tareas", label: "Tareas", icon: "✅" },
-  { href: "/trastes", label: "Trastes", icon: "🍽️" },
-  { href: "/deudas", label: "Deudas", icon: "💰" },
-  { href: "/recados", label: "Recados", icon: "📌" },
+  { href: "/", label: "Inicio", icon: House },
+  { href: "/tareas", label: "Tareas", icon: ListChecks },
+  { href: "/trastes", label: "Trastes", icon: CookingPot },
+  { href: "/deudas", label: "Deudas", icon: Wallet },
+  { href: "/recados", label: "Recados", icon: StickyNote },
 ];
 
 export function Nav({ pending }: { pending: number }) {
@@ -18,13 +19,16 @@ export function Nav({ pending }: { pending: number }) {
       <ul className="mx-auto flex max-w-3xl justify-around">
         {ITEMS.map((it) => {
           const active = it.href === "/" ? path === "/" : path.startsWith(it.href);
+          const Icon = it.icon;
           return (
             <li key={it.href} className="flex-1">
               <Link
                 href={it.href}
-                className={`relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-bold md:flex-row md:justify-center md:gap-2 md:py-3 md:text-sm ${active ? "text-brand-700" : "text-slate-500"}`}
+                className={`relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-bold md:flex-row md:justify-center md:gap-2 md:py-3 md:text-sm ${active ? "text-brand-700" : "text-slate-400"}`}
               >
-                <span className="text-xl md:text-base">{it.icon}</span>
+                <span className={`flex h-8 w-12 items-center justify-center rounded-full transition md:h-auto md:w-auto ${active ? "bg-brand-100" : ""}`}>
+                  <Icon size={21} strokeWidth={active ? 2.5 : 2} />
+                </span>
                 {it.label}
                 {it.href === "/" && pending > 0 && (
                   <span className="absolute top-1 right-[calc(50%-22px)] rounded-full bg-rose-600 px-1.5 text-[10px] text-white md:static">

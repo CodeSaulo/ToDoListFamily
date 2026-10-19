@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight, ListChecks, Plus, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { TaskCard } from "@/components/TaskCard";
 import { Avatar, Card, Empty, PageTitle } from "@/components/ui";
@@ -24,23 +25,23 @@ export default async function TareasPage({ searchParams }: { searchParams: Promi
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-2">
-        <PageTitle sub={formatDay(day)}>Tareas</PageTitle>
+        <PageTitle sub={formatDay(day)} icon={ListChecks} tone="blue">Tareas</PageTitle>
         {isAdmin && (
           <div className="flex gap-2">
-            <Link href="/tareas/gestionar" className="btn-soft">Gestionar</Link>
-            <Link href="/tareas/nueva" className="btn-primary">+ Nueva</Link>
+            <Link href="/tareas/gestionar" className="btn-soft" aria-label="Gestionar"><Settings2 size={16} /></Link>
+            <Link href="/tareas/nueva" className="btn-primary"><Plus size={16} strokeWidth={3} /> Nueva</Link>
           </div>
         )}
       </div>
 
       <div className="flex items-center justify-between rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-100">
-        <Link href={q(addDays(day, -1))} className="btn-soft">‹ Ayer</Link>
+        <Link href={q(addDays(day, -1))} className="btn-soft"><ChevronLeft size={16} /> Ayer</Link>
         {day !== today ? (
           <Link href={q(today)} className="text-sm font-bold text-brand-700">Ir a hoy</Link>
         ) : (
           <span className="text-sm font-bold text-slate-500">Hoy</span>
         )}
-        <Link href={q(addDays(day, 1))} className="btn-soft">Mañana ›</Link>
+        <Link href={q(addDays(day, 1))} className="btn-soft">Mañana <ChevronRight size={16} /></Link>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">

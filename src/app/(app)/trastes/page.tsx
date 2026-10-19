@@ -1,3 +1,4 @@
+import { CookingPot, Sparkles } from "lucide-react";
 import { addDishEntry, deleteDishEntry } from "@/app/actions";
 import { DishReview } from "@/components/ReviewButtons";
 import { ActButton, ActionForm, SubmitButton } from "@/components/forms";
@@ -12,7 +13,7 @@ export default async function TrastesPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="El pizarrón de consecuencias">Trastes 🍽️</PageTitle>
+      <PageTitle sub="El pizarrón de consecuencias" icon={CookingPot} tone="orange">Trastes</PageTitle>
 
       <div className="grid grid-cols-3 gap-2">
         {hijas.map((h) => (
@@ -31,9 +32,9 @@ export default async function TrastesPage() {
             <div>
               <label className="label">¿Qué es?</label>
               <select name="kind" className="input">
-                <option value="castigo">➕ Tanda de castigo</option>
-                <option value="tarea_extra">➖ Hice tarea extra</option>
-                <option value="pagada">➖ Ya lavé una tanda</option>
+                <option value="castigo">Tanda de castigo (suma)</option>
+                <option value="tarea_extra">Hice tarea extra (resta)</option>
+                <option value="pagada">Ya lavé una tanda de trastes (resta)</option>
               </select>
             </div>
             <div>
@@ -60,7 +61,10 @@ export default async function TrastesPage() {
 
       <Card title="Historial">
         {entries.length === 0 ? (
-          <Empty>El pizarrón está limpio ✨</Empty>
+          <Empty>
+            <Sparkles size={28} className="mx-auto mb-1 text-amber-400" />
+            El pizarrón está limpio
+          </Empty>
         ) : (
           <ul className="divide-y divide-slate-100">
             {entries.map((e) => (

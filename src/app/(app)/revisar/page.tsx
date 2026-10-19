@@ -1,3 +1,4 @@
+import { ClipboardCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 import { DebtReview, DishReview } from "@/components/ReviewButtons";
 import { TaskCard } from "@/components/TaskCard";
@@ -21,7 +22,7 @@ export default async function RevisarPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Den el visto bueno">Por revisar</PageTitle>
+      <PageTitle sub="Den el visto bueno" icon={ClipboardCheck} tone="violet">Por revisar</PageTitle>
 
       <Card title={`Tareas (${tasks.length})`}>
         {tasks.length === 0 ? (

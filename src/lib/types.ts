@@ -91,5 +91,5 @@ export const PRIORITY_LABEL: Record<Priority, string> = { alta: "Alta", normal: 
 export const DISH_KIND_LABEL: Record<DishEntry["kind"], string> = {
   castigo: "Castigo",
   tarea_extra: "Tarea extra",
-  pagada: "Tanda pagada",
+  pagada: "Lavó una tanda",
 };

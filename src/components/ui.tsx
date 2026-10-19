@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Priority, Profile, ReviewStatus, TaskStatus } from "@/lib/types";
 import { PRIORITY_LABEL, STATUS_LABEL } from "@/lib/types";
@@ -16,12 +17,48 @@ export function Card({ title, action, children, className = "" }: { title?: Reac
   );
 }
 
-export function PageTitle({ children, sub }: { children: ReactNode; sub?: ReactNode }) {
+const TONES = {
+  blue: "from-sky-400 to-blue-600",
+  pink: "from-pink-400 to-fuchsia-600",
+  violet: "from-violet-400 to-indigo-600",
+  orange: "from-amber-400 to-orange-500",
+  green: "from-emerald-400 to-teal-600",
+  yellow: "from-yellow-300 to-amber-500",
+} as const;
+
+export type Tone = keyof typeof TONES;
+
+/** Ícono dentro de un cuadrito redondeado con degradado. */
+export function IconTile({ icon: Icon, tone = "blue", size = 36 }: { icon: LucideIcon; tone?: Tone; size?: number }) {
   return (
-    <header className="mb-4">
-      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{children}</h1>
-      {sub && <p className="text-sm text-slate-500 first-letter:uppercase">{sub}</p>}
+    <span
+      className={`inline-flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm ${TONES[tone]}`}
+      style={{ width: size, height: size }}
+    >
+      <Icon size={size * 0.55} strokeWidth={2.25} />
+    </span>
+  );
+}
+
+export function PageTitle({ children, sub, icon, tone }: { children: ReactNode; sub?: ReactNode; icon?: LucideIcon; tone?: Tone }) {
+  return (
+    <header className="mb-4 flex items-center gap-3">
+      {icon && <IconTile icon={icon} tone={tone} size={44} />}
+      <div>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{children}</h1>
+        {sub && <p className="text-sm text-slate-500 first-letter:uppercase">{sub}</p>}
+      </div>
     </header>
+  );
+}
+
+/** Título de tarjeta con ícono. */
+export function IconTitle({ icon: Icon, children, className = "text-brand-600" }: { icon: LucideIcon; children: ReactNode; className?: string }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Icon size={18} strokeWidth={2.5} className={className} />
+      {children}
+    </span>
   );
 }
 

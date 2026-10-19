@@ -1,3 +1,4 @@
+import { Check, StickyNote, Trash2 } from "lucide-react";
 import { addNote, deleteNote, toggleNote } from "@/app/actions";
 import { ActButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Avatar, Card, Empty, PageTitle } from "@/components/ui";
@@ -12,7 +13,7 @@ export default async function RecadosPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Pendientes y cosas que no hay que olvidar">Recados 📌</PageTitle>
+      <PageTitle sub="Pendientes y cosas que no hay que olvidar" icon={StickyNote} tone="yellow">Recados</PageTitle>
 
       <Card>
         <ActionForm action={addNote} className="flex gap-2">
@@ -35,14 +36,14 @@ export default async function RecadosPage() {
                 <Avatar p={byId.get(n.created_by)} size={18} />
                 {displayName(byId.get(n.created_by))} · {formatShort(n.created_at)}
               </div>
-              {n.done && <p className="mt-1 text-xs">✓ Lo hizo {displayName(byId.get(n.done_by ?? ""))}</p>}
+              {n.done && <p className="mt-1 flex items-center gap-1 text-xs"><Check size={13} strokeWidth={3} /> Lo hizo {displayName(byId.get(n.done_by ?? ""))}</p>}
               <div className="mt-3 flex gap-2">
                 <ActButton action={toggleNote.bind(null, n.id, !n.done)} className="btn-soft !bg-white/70">
-                  {n.done ? "Desmarcar" : "✓ Ya quedó"}
+                  {n.done ? "Desmarcar" : <><Check size={15} strokeWidth={3} /> Ya quedó</>}
                 </ActButton>
                 {isAdmin && (
                   <ActButton action={deleteNote.bind(null, n.id)} className="btn-red" confirm="¿Quitar este recado?">
-                    Quitar
+                    <Trash2 size={15} /> Quitar
                   </ActButton>
                 )}
               </div>

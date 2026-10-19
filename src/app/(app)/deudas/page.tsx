@@ -1,7 +1,8 @@
+import { Package, Wallet } from "lucide-react";
 import { addDebtCharge, deleteDebtEntry, reportBlock, saveTarifa } from "@/app/actions";
 import { DebtReview } from "@/components/ReviewButtons";
 import { ActButton, ActionForm, SubmitButton, Toggle } from "@/components/forms";
-import { Avatar, Card, Empty, PageTitle, ReviewBadge } from "@/components/ui";
+import { Avatar, Card, Empty, IconTitle, PageTitle, ReviewBadge } from "@/components/ui";
 import { debtBalance, displayName, getDebtEntries, getSession, getTarifaBloque, money } from "@/lib/data";
 import { formatDate, formatShort, todayMX } from "@/lib/dates";
 
@@ -12,7 +13,7 @@ export default async function DeudasPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Lo que se debe y lo que se va abonando">Deudas 💰</PageTitle>
+      <PageTitle sub="Lo que se debe y lo que se va abonando" icon={Wallet} tone="green">Deudas</PageTitle>
 
       <div className="grid grid-cols-3 gap-2">
         {hijas.map((h) => {
@@ -29,7 +30,7 @@ export default async function DeudasPage() {
       </div>
 
       {!isAdmin && (
-        <Card title="📦 Trabajé un bloque">
+        <Card title={<IconTitle icon={Package} className="text-emerald-600">Trabajé un bloque</IconTitle>}>
           <ActionForm action={reportBlock}>
             <div className="grid grid-cols-2 gap-2">
               <div>

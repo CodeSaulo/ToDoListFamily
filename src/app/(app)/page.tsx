@@ -1,7 +1,8 @@
+import { CookingPot, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions";
 import { TaskCard } from "@/components/TaskCard";
-import { Avatar, Card, Empty, PageTitle } from "@/components/ui";
+import { Avatar, Card, Empty, IconTile, IconTitle } from "@/components/ui";
 import {
   debtBalance,
   dishBalance,
@@ -37,18 +38,32 @@ export default async function Home() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between">
-        <PageTitle sub={formatDay(today)}>¡Hola, {displayName(me)}! 👋</PageTitle>
-        <form action={signOut}>
-          <button className="text-xs font-semibold text-slate-400 hover:text-slate-600">Salir</button>
-        </form>
-      </div>
+      <header className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 via-violet-500 to-fuchsia-500 p-5 text-white shadow-lg shadow-violet-200">
+        <div className="absolute -top-10 -right-8 h-32 w-32 rounded-full bg-white/15" />
+        <div className="absolute -bottom-12 right-16 h-24 w-24 rounded-full bg-white/10" />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Avatar p={me} size={48} />
+            <div>
+              <p className="text-sm font-semibold text-white/80 first-letter:uppercase">{formatDay(today)}</p>
+              <h1 className="text-2xl font-extrabold leading-tight">¡Hola, {displayName(me)}!</h1>
+            </div>
+          </div>
+          <form action={signOut}>
+            <button className="flex items-center gap-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-bold backdrop-blur hover:bg-white/30" aria-label="Salir">
+              <LogOut size={14} /> Salir
+            </button>
+          </form>
+        </div>
+      </header>
 
       {announcements.length > 0 && (
         <div className="space-y-2">
           {announcements.map((a) => (
             <div key={a.id} className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-400 p-4 text-white shadow-sm">
-              <span className="text-2xl">📣</span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/25">
+                <Megaphone size={22} strokeWidth={2.25} />
+              </span>
               <div>
                 <p className="font-extrabold leading-tight">{a.body}</p>
                 {a.show_time && <p className="text-sm font-semibold opacity-90">{a.show_time}</p>}
@@ -59,7 +74,7 @@ export default async function Home() {
       )}
 
       {isAdmin && (
-        <Card title="Por revisar" action={<Link href="/revisar" className="text-sm font-bold text-brand-700">Ver todo →</Link>}>
+        <Card title={<IconTitle icon={ClipboardCheck} className="text-violet-600">Por revisar</IconTitle>} action={<Link href="/revisar" className="text-sm font-bold text-brand-700">Ver todo <ChevronRight size={14} className="inline" /></Link>}>
           <div className="grid grid-cols-3 gap-2 text-center">
             <ReviewTile href="/revisar" n={toReview.length} label="Tareas" />
             <ReviewTile href="/revisar" n={pendingDishes} label="Trastes" />
@@ -71,20 +86,25 @@ export default async function Home() {
       {!isAdmin && (
         <div className="grid grid-cols-2 gap-3">
           <Link href="/trastes" className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-            <p className="text-xs font-bold text-slate-500">🍽️ Tandas de trastes</p>
-            <p className="text-3xl font-extrabold">{dishBalance(dishes, me.id)}</p>
+            <IconTile icon={CookingPot} tone="orange" />
+            <p className="mt-2 text-3xl font-extrabold">{dishBalance(dishes, me.id)}</p>
+            <p className="text-xs font-bold text-slate-500">Tandas de trastes</p>
           </Link>
           <Link href="/deudas" className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-            <p className="text-xs font-bold text-slate-500">💰 Debo</p>
-            <p className="text-2xl font-extrabold">{money(debtBalance(debts, me.id))}</p>
+            <IconTile icon={Wallet} tone="green" />
+            <p className="mt-2 text-2xl font-extrabold">{money(debtBalance(debts, me.id))}</p>
+            <p className="text-xs font-bold text-slate-500">Lo que debo</p>
           </Link>
         </div>
       )}
 
       {!isAdmin && (
-        <Card title="Mis tareas de hoy">
+        <Card title={<IconTitle icon={ListChecks}>Mis tareas de hoy</IconTitle>}>
           {myTasks.length === 0 ? (
-            <Empty>No tienes tareas pendientes 🎉</Empty>
+            <Empty>
+              <PartyPopper size={28} className="mx-auto mb-1 text-fuchsia-500" />
+              No tienes tareas pendientes
+            </Empty>
           ) : (
             <div className="space-y-2">
               {myTasks.map((i) => (
@@ -95,7 +115,7 @@ export default async function Home() {
         </Card>
       )}
 
-      <Card title="La familia hoy" action={<Link href="/tareas" className="text-sm font-bold text-brand-700">Tareas →</Link>}>
+      <Card title={<IconTitle icon={Users} className="text-fuchsia-600">La familia hoy</IconTitle>} action={<Link href="/tareas" className="text-sm font-bold text-brand-700">Tareas <ChevronRight size={14} className="inline" /></Link>}>
         <div className="space-y-3">
           {hijas.map((h) => {
             const list = instances.filter((i) => i.assignee === h.id);
@@ -116,8 +136,9 @@ export default async function Home() {
                   <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
                     <div className="h-full rounded-full" style={{ width: `${pct}%`, background: h.color }} />
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
-                    🍽️ {dishBalance(dishes, h.id)} tandas · 💰 {money(debtBalance(debts, h.id))}
+                  <p className="mt-1 flex items-center gap-3 text-xs text-slate-500">
+                    <span className="inline-flex items-center gap-1"><CookingPot size={13} /> {dishBalance(dishes, h.id)} tandas</span>
+                    <span className="inline-flex items-center gap-1"><Wallet size={13} /> {money(debtBalance(debts, h.id))}</span>
                   </p>
                 </div>
               </div>
@@ -127,7 +148,7 @@ export default async function Home() {
         </div>
       </Card>
 
-      <Card title="Recados" action={<Link href="/recados" className="text-sm font-bold text-brand-700">Ver y pegar →</Link>}>
+      <Card title={<IconTitle icon={StickyNote} className="text-amber-500">Recados</IconTitle>} action={<Link href="/recados" className="text-sm font-bold text-brand-700">Ver y pegar <ChevronRight size={14} className="inline" /></Link>}>
         {notes.length === 0 ? (
           <Empty>Sin recados pendientes.</Empty>
         ) : (
@@ -149,9 +170,9 @@ export default async function Home() {
 
       {isAdmin && (
         <div className="flex flex-wrap gap-2">
-          <Link href="/tareas/nueva" className="btn-primary">+ Nueva tarea</Link>
-          <Link href="/anuncios" className="btn-soft">📣 Anuncios</Link>
-          <Link href="/familia" className="btn-soft">👨‍👩‍👧‍👧 Familia</Link>
+          <Link href="/tareas/nueva" className="btn-primary"><Plus size={16} strokeWidth={3} /> Nueva tarea</Link>
+          <Link href="/anuncios" className="btn-soft"><Megaphone size={16} /> Anuncios</Link>
+          <Link href="/familia" className="btn-soft"><Users size={16} /> Familia</Link>
         </div>
       )}
     </div>

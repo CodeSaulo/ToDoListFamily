@@ -34,12 +34,13 @@ export function TaskForm({ task, people }: { task?: Task; people: Profile[] }) {
         <legend className="label">Prioridad</legend>
         <div className="flex gap-2">
           {[
-            ["alta", "🔴 Alta"],
-            ["normal", "🟡 Normal"],
-            ["baja", "⚪ Baja"],
-          ].map(([v, l]) => (
-            <label key={v} className="chip">
+            ["alta", "Alta", "bg-rose-500"],
+            ["normal", "Normal", "bg-amber-400"],
+            ["baja", "Baja", "bg-slate-300"],
+          ].map(([v, l, dot]) => (
+            <label key={v} className="chip gap-1.5">
               <input type="radio" name="priority" value={v} defaultChecked={(task?.priority ?? "normal") === v} className="sr-only" />
+              <span className={`h-2.5 w-2.5 rounded-full ring-2 ring-white ${dot}`} />
               {l}
             </label>
           ))}

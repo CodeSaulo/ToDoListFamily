@@ -1,3 +1,4 @@
+import { Check, MessageCircle, Play, RotateCcw, Undo2 } from "lucide-react";
 import { returnTask, setTaskStatus } from "@/app/actions";
 import { ActButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Avatar, PriorityBadge, StatusBadge } from "@/components/ui";
@@ -42,7 +43,9 @@ export function TaskCard({
           </div>
           {inst.task.description && <p className="mt-1 text-sm text-slate-600">{inst.task.description}</p>}
           {inst.review_note && (
-            <p className="mt-1 rounded-lg bg-orange-50 px-2 py-1 text-sm text-orange-800">💬 {inst.review_note}</p>
+            <p className="mt-1 flex items-start gap-1.5 rounded-lg bg-orange-50 px-2 py-1 text-sm text-orange-800">
+              <MessageCircle size={15} className="mt-0.5 shrink-0" /> {inst.review_note}
+            </p>
           )}
         </div>
       </div>
@@ -50,26 +53,32 @@ export function TaskCard({
       <div className="mt-2 flex flex-wrap gap-2">
         {mine && !isAdmin && (s === "por_hacer" || s === "regresada") && (
           <>
-            <ActButton action={set("en_proceso")}>Empezar</ActButton>
+            <ActButton action={set("en_proceso")}>
+              <Play size={15} /> Empezar
+            </ActButton>
             <ActButton action={set("para_revisar")} className="btn-primary">
-              ¡Ya terminé!
+              <Check size={16} strokeWidth={3} /> ¡Ya terminé!
             </ActButton>
           </>
         )}
         {mine && !isAdmin && s === "en_proceso" && (
           <>
-            <ActButton action={set("por_hacer")}>Todavía no</ActButton>
+            <ActButton action={set("por_hacer")}>
+              <Undo2 size={15} /> Todavía no
+            </ActButton>
             <ActButton action={set("para_revisar")} className="btn-primary">
-              ¡Ya terminé!
+              <Check size={16} strokeWidth={3} /> ¡Ya terminé!
             </ActButton>
           </>
         )}
-        {mine && !isAdmin && s === "para_revisar" && <ActButton action={set("en_proceso")}>Me faltó algo</ActButton>}
+        {mine && !isAdmin && s === "para_revisar" && <ActButton action={set("en_proceso")}>
+            <Undo2 size={15} /> Me faltó algo
+          </ActButton>}
 
         {isAdmin && s !== "aprobada" && (
           <>
             <ActButton action={set("aprobada")} className="btn-green">
-              ✓ Aprobar
+              <Check size={16} strokeWidth={3} /> Aprobar
             </ActButton>
             <details className="w-full">
               <summary className="cursor-pointer text-sm font-semibold text-orange-700">Regresar con comentario</summary>
@@ -83,7 +92,7 @@ export function TaskCard({
         )}
         {isAdmin && s === "aprobada" && (
           <ActButton action={set("por_hacer")} className="btn-soft">
-            Deshacer
+            <RotateCcw size={15} /> Deshacer
           </ActButton>
         )}
       </div>
