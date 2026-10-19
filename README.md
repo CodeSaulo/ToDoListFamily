@@ -31,7 +31,7 @@ Los permisos viven en la base de datos (`supabase/migrations/0001_init.sql`), as
    ```
 
 4. En **Authentication → Sign In / Providers → Email**, desactiva *Confirm email* (opcional, evita esperar el correo de confirmación). Si lo dejas activo, en **URL Configuration** pon la URL de Vercel como *Site URL*.
-5. Copia `.env.example` a `.env.local` con el *Project URL* y la *anon/publishable key* (en Vercel, ponlas como variables de entorno).
+5. Copia `.env.example` a `.env.local` con el *Project URL* y la *publishable key* (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; también acepta `NEXT_PUBLIC_SUPABASE_ANON_KEY`) (en Vercel, ponlas como variables de entorno).
 6. Cada quien entra a la app, toca **"¿Primera vez? Crea tu contraseña"** y listo.
 
 ## Desarrollo
