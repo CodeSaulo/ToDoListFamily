@@ -55,6 +55,7 @@ export type DebtEntry = {
   amount: number;
   concept: string;
   work_date: string | null;
+  block_hours: 2 | 3 | null;
   status: ReviewStatus;
   created_by: string;
   created_at: string;
@@ -101,3 +102,7 @@ export type Obligation = {
   position: number;
   active: boolean;
 };
+
+/** Pago fijo por bloque de Amazon (la base de datos aplica el mismo monto). */
+export const BLOCK_RATES = { 2: 30, 3: 40 } as const;
+export const BLOCK_LABEL = { 2: "Bloque de 2 horas", 3: "Bloque de 3 horas o más" } as const;

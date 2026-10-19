@@ -97,11 +97,6 @@ export async function getTodayAnnouncements(day: string): Promise<Announcement[]
   );
 }
 
-export async function getTarifaBloque(): Promise<number> {
-  const { supabase } = await getSession();
-  const { data } = await supabase.from("settings").select("value").eq("key", "tarifa_bloque").maybeSingle();
-  return Number(data?.value ?? 0);
-}
 
 export const money = (n: number) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);

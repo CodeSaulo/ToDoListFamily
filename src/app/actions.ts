@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { TaskStatus } from "@/lib/types";
+import { BLOCK_LABEL, BLOCK_RATES, type TaskStatus } from "@/lib/types";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
 
@@ -174,21 +174,23 @@ export async function addDebtCharge(_: ActionState, fd: FormData): Promise<Actio
 
 export async function reportBlock(_: ActionState, fd: FormData): Promise<ActionState> {
   const supabase = await createClient();
-  const amount = Number(str(fd, "amount"));
+  const hours = Number(str(fd, "block_hours"));
   const workDate = str(fd, "work_date");
-  if (!(amount > 0)) return { error: "Escribe el monto del bloque." };
+  if (hours !== 2 && hours !== 3) return { error: "Elige si fue de 2 horas o de 3 horas o más." };
   if (!workDate) return { error: "Elige la fecha del bloque." };
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const note = str(fd, "concept");
   const { error } = await supabase.from("debt_entries").insert({
-    hija: user?.id,
+    hija: str(fd, "hija") || user?.id,
     kind: "abono",
-    amount,
-    concept: str(fd, "concept") || "Bloque de Amazon",
+    block_hours: hours,
+    amount: BLOCK_RATES[hours], // la base de datos vuelve a fijar el monto
+    concept: `${BLOCK_LABEL[hours]} de Amazon${note ? ` · ${note}` : ""}`,
     work_date: workDate,
   });
-  return done(error, "Enviado para revisión");
+  return done(error, str(fd, "hija") ? "Bloque registrado" : "Enviado para revisión");
 }
 
 export async function reviewDebtEntry(id: string, approve: boolean): Promise<ActionState> {
@@ -206,13 +208,6 @@ export async function deleteDebtEntry(id: string): Promise<ActionState> {
   return done(error, "Borrado");
 }
 
-export async function saveTarifa(_: ActionState, fd: FormData): Promise<ActionState> {
-  const supabase = await createClient();
-  const value = Number(str(fd, "tarifa"));
-  if (!(value >= 0)) return { error: "Monto inválido." };
-  const { error } = await supabase.from("settings").upsert({ key: "tarifa_bloque", value });
-  return done(error, "Tarifa guardada");
-}
 
 // ============ Recados ============
 

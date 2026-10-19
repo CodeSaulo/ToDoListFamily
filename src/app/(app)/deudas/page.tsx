@@ -1,14 +1,15 @@
 import { Package, Wallet } from "lucide-react";
-import { addDebtCharge, deleteDebtEntry, reportBlock, saveTarifa } from "@/app/actions";
+import { addDebtCharge, deleteDebtEntry, reportBlock } from "@/app/actions";
 import { DebtReview } from "@/components/ReviewButtons";
-import { ActButton, ActionForm, SubmitButton, Toggle } from "@/components/forms";
+import { ActButton, ActionForm, SubmitButton } from "@/components/forms";
 import { Avatar, Card, Empty, IconTitle, PageTitle, ReviewBadge } from "@/components/ui";
-import { debtBalance, displayName, getDebtEntries, getSession, getTarifaBloque, money } from "@/lib/data";
+import { debtBalance, displayName, getDebtEntries, getSession, money } from "@/lib/data";
+import { BLOCK_RATES } from "@/lib/types";
 import { formatDate, formatShort, todayMX } from "@/lib/dates";
 
 export default async function DeudasPage() {
   const { me, isAdmin, hijas, byId } = await getSession();
-  const [entries, tarifa] = await Promise.all([getDebtEntries(), getTarifaBloque()]);
+  const entries = await getDebtEntries();
   const visible = isAdmin ? entries : entries.filter((e) => e.hija === me.id);
 
   return (
@@ -32,24 +33,28 @@ export default async function DeudasPage() {
       {!isAdmin && (
         <Card title={<IconTitle icon={Package} className="text-emerald-600">Trabajé un bloque</IconTitle>}>
           <ActionForm action={reportBlock}>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="label">¿Qué día?</label>
-                <input type="date" name="work_date" defaultValue={todayMX()} className="input" />
-              </div>
-              <div>
-                <label className="label">Monto</label>
-                <input type="number" name="amount" step="0.01" min="0" defaultValue={tarifa || ""} className="input" />
-              </div>
-            </div>
-            <input name="concept" className="input" placeholder="Bloque de Amazon (opcional: horario, nota)" />
+            <BlockFields />
             <SubmitButton className="btn-primary w-full">Enviar para revisión</SubmitButton>
           </ActionForm>
         </Card>
       )}
 
       {isAdmin && (
-        <Card title="Registrar">
+        <Card title={<IconTitle icon={Package} className="text-emerald-600">Registrar bloque</IconTitle>}>
+          <ActionForm action={reportBlock}>
+            <select name="hija" className="input">
+              {hijas.map((h) => (
+                <option key={h.id} value={h.id}>{displayName(h)}</option>
+              ))}
+            </select>
+            <BlockFields />
+            <SubmitButton className="btn-primary w-full">Registrar bloque (queda aprobado)</SubmitButton>
+          </ActionForm>
+        </Card>
+      )}
+
+      {isAdmin && (
+        <Card title="Registrar deuda u otro pago">
           <ActionForm action={addDebtCharge}>
             <div className="grid grid-cols-2 gap-2">
               <select name="hija" className="input">
@@ -59,7 +64,7 @@ export default async function DeudasPage() {
               </select>
               <select name="kind" className="input">
                 <option value="cargo">Debe (cargo)</option>
-                <option value="abono">Abonó (pago)</option>
+                <option value="abono">Abonó (otro pago)</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -69,14 +74,6 @@ export default async function DeudasPage() {
             <input name="concept" className="input" placeholder="Ej. Salida al cine" />
             <SubmitButton className="btn-primary w-full">Guardar</SubmitButton>
           </ActionForm>
-          <div className="mt-4 border-t border-slate-100 pt-3">
-            <Toggle label={`Tarifa por bloque: ${money(tarifa)}`} className="text-sm font-bold text-brand-700">
-              <ActionForm action={saveTarifa} className="flex gap-2" resetOnOk={false}>
-                <input name="tarifa" type="number" step="0.01" min="0" defaultValue={tarifa} className="input" />
-                <SubmitButton className="btn-soft">Guardar</SubmitButton>
-              </ActionForm>
-            </Toggle>
-          </div>
         </Card>
       )}
 
@@ -123,5 +120,33 @@ export default async function DeudasPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+/** Fecha y tipo de bloque; el monto es fijo según el tipo. */
+function BlockFields() {
+  return (
+    <>
+      <div>
+        <label className="label">¿Qué día?</label>
+        <input type="date" name="work_date" defaultValue={todayMX()} className="input" />
+      </div>
+      <fieldset>
+        <legend className="label">¿De cuántas horas fue?</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {([2, 3] as const).map((h, i) => (
+            <label
+              key={h}
+              className="cursor-pointer rounded-xl border-2 border-slate-200 bg-white p-3 text-center has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50"
+            >
+              <input type="radio" name="block_hours" value={h} defaultChecked={i === 0} className="sr-only" />
+              <p className="text-sm font-bold text-slate-600">{h === 2 ? "2 horas" : "3 horas o más"}</p>
+              <p className="text-2xl font-extrabold text-emerald-700">{money(BLOCK_RATES[h])}</p>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <input name="concept" className="input" placeholder="Nota (opcional), ej. turno de la mañana" />
+    </>
   );
 }
