@@ -276,3 +276,12 @@ export async function saveMember(_: ActionState, fd: FormData): Promise<ActionSt
   const res = await supabase.from("profiles").update(row).eq("email", email);
   return done(res.error, "Guardado. Si aún no tiene cuenta, ya puede crear su contraseña.");
 }
+
+export async function resetPassword(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const password = str(fd, "password");
+  if (password.length < 6) return { error: "La contraseña debe tener al menos 6 caracteres." };
+  const { error } = await supabase.rpc("admin_set_password", { p_email: str(fd, "email"), p_password: password });
+  if (error) return { error: friendly(error.message) };
+  return { ok: "Contraseña cambiada. Ya puede entrar con la nueva." };
+}

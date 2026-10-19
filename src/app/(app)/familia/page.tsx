@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { saveMember } from "@/app/actions";
+import { resetPassword, saveMember } from "@/app/actions";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Card, PageTitle } from "@/components/ui";
 import { getSession } from "@/lib/data";
@@ -35,6 +35,22 @@ export default async function FamiliaPage() {
             </li>
           ))}
         </ul>
+      </Card>
+      <Card title="🔑 Cambiar contraseña">
+        <p className="mb-3 text-sm text-slate-500">Si a alguien se le olvidó, ponle una nueva aquí y díselo para que entre.</p>
+        <ActionForm action={resetPassword}>
+          <select name="email" className="input">
+            {members
+              .filter((m) => registered.has(m.email))
+              .map((m) => (
+                <option key={m.email} value={m.email}>
+                  {m.nickname || m.name}
+                </option>
+              ))}
+          </select>
+          <input name="password" type="text" autoComplete="off" minLength={6} className="input" placeholder="Contraseña nueva (6 o más)" />
+          <SubmitButton className="btn-primary w-full">Cambiar contraseña</SubmitButton>
+        </ActionForm>
       </Card>
       <Card title="Agregar o corregir">
         <ActionForm action={saveMember}>
