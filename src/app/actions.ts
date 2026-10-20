@@ -285,13 +285,41 @@ export async function resetPassword(_: ActionState, fd: FormData): Promise<Actio
 
 export async function saveObligation(_: ActionState, fd: FormData): Promise<ActionState> {
   const supabase = await createClient();
+  const id = str(fd, "id");
   const title = str(fd, "title");
   if (!title) return { error: "Escribe la obligación." };
+  const row = {
+    title,
+    description: str(fd, "description") || null,
+    includes: str(fd, "includes") || null,
+    handover_rules: str(fd, "handover_rules") || null,
+  };
+  if (id) {
+    const { error } = await supabase.from("obligations").update(row).eq("id", id);
+    return done(error, "Guardado");
+  }
   const { count } = await supabase.from("obligations").select("id", { count: "exact", head: true });
-  const { error } = await supabase
-    .from("obligations")
-    .insert({ title, description: str(fd, "description") || null, position: count ?? 0 });
+  const { error } = await supabase.from("obligations").insert({ ...row, position: count ?? 0 });
   return done(error, "Obligación agregada");
+}
+
+export async function markHandover(
+  obligationId: string,
+  weekStart: string,
+  hija: string,
+  status: "por_revisar" | "entregada" | "no_entregada",
+): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("obligation_handovers")
+    .upsert({ obligation_id: obligationId, week_start: weekStart, hija, status }, { onConflict: "obligation_id,week_start" });
+  return done(error, "Listo");
+}
+
+export async function saveGeneralRules(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("settings").upsert({ key: "reglas_generales", value: str(fd, "rules") });
+  return done(error, "Reglas guardadas");
 }
 
 export async function deleteObligation(id: string): Promise<ActionState> {

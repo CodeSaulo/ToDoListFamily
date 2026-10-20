@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Announcement, DebtEntry, DishEntry, Obligation, Profile, TaskInstance } from "@/lib/types";
-import { weekNumber, weekdayOf } from "@/lib/dates";
+import type { Announcement, DebtEntry, DishEntry, Handover, Obligation, Profile, TaskInstance } from "@/lib/types";
+import { addDays, mondayOf, weekNumber, weekdayOf } from "@/lib/dates";
 
 export const getSession = cache(async () => {
   const supabase = await createClient();
@@ -101,22 +101,75 @@ export async function getTodayAnnouncements(day: string): Promise<Announcement[]
 export const money = (n: number) =>
   new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
 
-/** Quién tiene cada obligación en la semana de `day`. */
-export async function getRotation(day: string) {
-  const { supabase, hijas } = await getSession();
+const getObligationsData = cache(async () => {
+  const { supabase } = await getSession();
   const [{ data }, { data: off }] = await Promise.all([
     supabase.from("obligations").select("*").eq("active", true).order("position").order("created_at"),
     supabase.from("settings").select("value").eq("key", "rotacion_offset").maybeSingle(),
   ]);
-  const obligations = (data ?? []) as Obligation[];
+  return { obligations: (data ?? []) as Obligation[], offset: Number(off?.value ?? 0) };
+});
+
+/** Quién tiene cada obligación en la semana de `day`. */
+export async function getRotation(day: string) {
+  const { hijas } = await getSession();
+  const { obligations, offset } = await getObligationsData();
   const order = [...hijas].sort((a, b) => a.name.localeCompare(b.name));
-  const shift = weekNumber(day) + Number(off?.value ?? 0);
+  const shift = weekNumber(day) + offset;
   const n = order.length;
   return {
-    offset: Number(off?.value ?? 0),
+    offset,
     rows: obligations.map((o, i) => ({
       obligation: o,
       hija: n ? order[(((i + shift) % n) + n) % n] : undefined,
     })),
   };
+}
+
+export type HandoverItem = {
+  obligation: Obligation;
+  hija: Profile | undefined;
+  weekStart: string;
+  handover: Handover | undefined;
+};
+
+/**
+ * Entregas de esta semana y las que siguen sin entregarse de semanas anteriores.
+ * Una obligación de la semana pasada sin entrega aprobada sigue siendo de quien la tenía.
+ */
+export async function getHandoverBoard(today: string) {
+  const { supabase, byId } = await getSession();
+  const monday = mondayOf(today);
+  const lastMonday = addDays(monday, -7);
+  const [current, last, { data }] = await Promise.all([
+    getRotation(monday),
+    getRotation(lastMonday),
+    supabase.from("obligation_handovers").select("*").or(`week_start.gte.${lastMonday},status.neq.entregada`),
+  ]);
+  const handovers = (data ?? []) as Handover[];
+  const find = (oid: string, week: string) => handovers.find((h) => h.obligation_id === oid && h.week_start === week);
+
+  const thisWeek: HandoverItem[] = current.rows.map((r) => ({
+    ...r,
+    weekStart: monday,
+    handover: find(r.obligation.id, monday),
+  }));
+
+  // La semana pasada: todo lo que no tenga entrega aprobada (si la obligación ya existía).
+  const overdue: HandoverItem[] = last.rows
+    .filter((r) => r.obligation.created_at.slice(0, 10) < monday)
+    .map((r) => {
+      const h = find(r.obligation.id, lastMonday);
+      return { ...r, hija: h ? byId.get(h.hija) : r.hija, weekStart: lastMonday, handover: h };
+    })
+    .filter((it) => it.handover?.status !== "entregada");
+
+  // Semanas más viejas que se marcaron sin entregar o siguen por revisar.
+  const { obligations } = await getObligationsData();
+  for (const h of handovers) {
+    if (h.week_start >= lastMonday || h.status === "entregada") continue;
+    const obligation = obligations.find((o) => o.id === h.obligation_id);
+    if (obligation) overdue.push({ obligation, hija: byId.get(h.hija), weekStart: h.week_start, handover: h });
+  }
+  return { monday, thisWeek, overdue };
 }

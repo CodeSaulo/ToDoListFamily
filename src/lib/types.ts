@@ -101,6 +101,19 @@ export type Obligation = {
   description: string | null;
   position: number;
   active: boolean;
+  includes: string | null;
+  handover_rules: string | null;
+  created_at: string;
+};
+
+export type HandoverStatus = "por_revisar" | "entregada" | "no_entregada";
+
+export type Handover = {
+  id: string;
+  obligation_id: string;
+  week_start: string;
+  hija: string;
+  status: HandoverStatus;
 };
 
 /** Pago fijo por bloque de Amazon (la base de datos aplica el mismo monto). */

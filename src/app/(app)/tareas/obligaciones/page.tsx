@@ -51,7 +51,8 @@ export default async function ObligacionesPage() {
         )}
         <ActionForm action={saveObligation}>
           <input name="title" className="input" placeholder="Ej. Cocina, Baños, Sala y comedor" />
-          <input name="description" className="input" placeholder="Qué incluye (opcional)" />
+          <input name="description" className="input" placeholder="Descripción corta (opcional)" />
+          <p className="text-xs text-slate-500">Lo que incluye hacerla y entregarla se detalla en la página de Reglas.</p>
           <SubmitButton className="btn-primary w-full">Agregar obligación</SubmitButton>
         </ActionForm>
       </Card>
