@@ -119,3 +119,18 @@ export type Handover = {
 /** Pago fijo por bloque de Amazon (la base de datos aplica el mismo monto). */
 export const BLOCK_RATES = { 2: 30, 3: 40 } as const;
 export const BLOCK_LABEL = { 2: "Bloque de 2 horas", 3: "Bloque de 3 horas o más" } as const;
+
+export type MealSlot = "desayuno" | "comida" | "cena";
+
+export type Meal = {
+  id: string;
+  title: string;
+  notes: string | null;
+  status: "propuesto" | "aceptado" | "rechazado";
+  day: string | null;
+  slot: MealSlot;
+  proposed_by: string | null;
+  created_at: string;
+};
+
+export const SLOT_LABEL: Record<MealSlot, string> = { desayuno: "Desayuno", comida: "Comida", cena: "Cena" };

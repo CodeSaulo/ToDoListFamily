@@ -336,3 +336,47 @@ export async function shiftRotation(delta: number): Promise<ActionState> {
     .upsert({ key: "rotacion_offset", value: Number(data?.value ?? 0) + delta });
   return done(error, "Rol ajustado");
 }
+
+// ============ Guisados ============
+
+export async function addMeal(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const title = str(fd, "title");
+  if (!title) return { error: "Escribe el guisado." };
+  const { error } = await supabase.from("meals").insert({
+    title,
+    notes: str(fd, "notes") || null,
+    day: str(fd, "day") || null,
+    slot: str(fd, "slot") || "comida",
+  });
+  return done(error, "¡Listo!");
+}
+
+export async function scheduleMeal(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const day = str(fd, "day");
+  if (!day) return { error: "Elige el día." };
+  const { error } = await supabase
+    .from("meals")
+    .update({ status: "aceptado", day, slot: str(fd, "slot") || "comida" })
+    .eq("id", str(fd, "id"));
+  return done(error, "Agregado al calendario");
+}
+
+export async function rejectMeal(id: string): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("meals").update({ status: "rechazado" }).eq("id", id);
+  return done(error, "Rechazado");
+}
+
+export async function unscheduleMeal(id: string): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("meals").update({ status: "propuesto", day: null }).eq("id", id);
+  return done(error, "Regresado a propuestas");
+}
+
+export async function deleteMeal(id: string): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("meals").delete().eq("id", id);
+  return done(error, "Borrado");
+}

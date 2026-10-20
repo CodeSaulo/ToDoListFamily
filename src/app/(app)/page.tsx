@@ -1,4 +1,4 @@
-import { CookingPot, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
+import { ChefHat, CookingPot, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions";
 import { ObligationsCard } from "@/components/ObligationsCard";
@@ -17,7 +17,7 @@ import {
   money,
 } from "@/lib/data";
 import { formatDay, formatShort, todayMX } from "@/lib/dates";
-import type { Note } from "@/lib/types";
+import { SLOT_LABEL, type Meal, type Note } from "@/lib/types";
 
 export default async function Home() {
   const { supabase, me, isAdmin, hijas, byId } = await getSession();
@@ -31,6 +31,8 @@ export default async function Home() {
     supabase.from("notes").select("*").eq("done", false).order("created_at", { ascending: false }).limit(5),
   ]);
   const notes = (notesRes.data ?? []) as Note[];
+  const { data: mealsData } = await supabase.from("meals").select("*").eq("status", "aceptado").eq("day", today);
+  const todayMeals = (mealsData ?? []) as Meal[];
 
   const myTasks = [...overdue, ...instances].filter((i) => i.assignee === me.id);
   const toReview = [...overdue, ...instances].filter((i) => i.status === "para_revisar");
@@ -115,6 +117,23 @@ export default async function Home() {
           )}
         </Card>
       )}
+
+      <Link href="/guisados" className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white">
+          <ChefHat size={22} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-slate-500">Hoy se come</p>
+          {todayMeals.length === 0 ? (
+            <p className="font-bold text-slate-400">Sin guisado todavía</p>
+          ) : (
+            <p className="truncate font-extrabold">
+              {todayMeals.map((m) => `${m.title} (${SLOT_LABEL[m.slot].toLowerCase()})`).join(" · ")}
+            </p>
+          )}
+        </div>
+        <ChevronRight size={18} className="text-slate-300" />
+      </Link>
 
       <ObligationsCard />
 

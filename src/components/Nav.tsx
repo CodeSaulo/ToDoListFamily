@@ -1,12 +1,13 @@
 "use client";
 
-import { House, ListChecks, CookingPot, Wallet, StickyNote } from "lucide-react";
+import { ChefHat, House, ListChecks, CookingPot, Wallet, StickyNote } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ITEMS = [
   { href: "/", label: "Inicio", icon: House },
   { href: "/tareas", label: "Tareas", icon: ListChecks },
+  { href: "/guisados", label: "Guisados", icon: ChefHat },
   { href: "/trastes", label: "Trastes", icon: CookingPot },
   { href: "/deudas", label: "Deudas", icon: Wallet },
   { href: "/recados", label: "Recados", icon: StickyNote },
@@ -24,9 +25,9 @@ export function Nav({ pending }: { pending: number }) {
             <li key={it.href} className="flex-1">
               <Link
                 href={it.href}
-                className={`relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-bold md:flex-row md:justify-center md:gap-2 md:py-3 md:text-sm ${active ? "text-brand-700" : "text-slate-400"}`}
+                className={`relative flex flex-col items-center gap-0.5 py-2 text-[10.5px] font-bold md:flex-row md:justify-center md:gap-2 md:py-3 md:text-sm ${active ? "text-brand-700" : "text-slate-400"}`}
               >
-                <span className={`flex h-8 w-12 items-center justify-center rounded-full transition md:h-auto md:w-auto ${active ? "bg-brand-100" : ""}`}>
+                <span className={`flex h-8 w-11 items-center justify-center rounded-full transition md:h-auto md:w-auto ${active ? "bg-brand-100" : ""}`}>
                   <Icon size={21} strokeWidth={active ? 2.5 : 2} />
                 </span>
                 {it.label}
