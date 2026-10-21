@@ -163,7 +163,7 @@ export async function addDebtCharge(_: ActionState, fd: FormData): Promise<Actio
   if (!(amount > 0)) return { error: "Escribe un monto mayor a cero." };
   if (!str(fd, "concept")) return { error: "Escribe el concepto." };
   const { error } = await supabase.from("debt_entries").insert({
-    hija: str(fd, "hija"),
+    account_id: str(fd, "account"),
     kind: str(fd, "kind") || "cargo",
     amount,
     concept: str(fd, "concept"),
@@ -183,14 +183,14 @@ export async function reportBlock(_: ActionState, fd: FormData): Promise<ActionS
   } = await supabase.auth.getUser();
   const note = str(fd, "concept");
   const { error } = await supabase.from("debt_entries").insert({
-    hija: str(fd, "hija") || user?.id,
+    ...(str(fd, "account") ? { account_id: str(fd, "account") } : { hija: user?.id }),
     kind: "abono",
     block_hours: hours,
     amount: BLOCK_RATES[hours], // la base de datos vuelve a fijar el monto
     concept: `${BLOCK_LABEL[hours]} de Amazon${note ? ` · ${note}` : ""}`,
     work_date: workDate,
   });
-  return done(error, str(fd, "hija") ? "Bloque registrado" : "Enviado para revisión");
+  return done(error, str(fd, "account") ? "Bloque registrado" : "Enviado para revisión");
 }
 
 export async function reviewDebtEntry(id: string, approve: boolean): Promise<ActionState> {
@@ -379,4 +379,18 @@ export async function deleteMeal(id: string): Promise<ActionState> {
   const supabase = await createClient();
   const { error } = await supabase.from("meals").delete().eq("id", id);
   return done(error, "Borrado");
+}
+
+export async function saveDebtAccount(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const name = str(fd, "name");
+  if (!name) return { error: "Escribe el nombre de la cuenta." };
+  const { error } = await supabase.from("debt_accounts").insert({ name, color: str(fd, "color") || "#64748b" });
+  return done(error, "Cuenta creada");
+}
+
+export async function deleteDebtAccount(id: string): Promise<ActionState> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("debt_accounts").delete().eq("id", id).is("profile_id", null);
+  return done(error, "Cuenta borrada");
 }

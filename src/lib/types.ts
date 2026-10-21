@@ -48,9 +48,17 @@ export type DishEntry = {
   created_at: string;
 };
 
+export type DebtAccount = {
+  id: string;
+  name: string;
+  profile_id: string | null;
+  color: string;
+};
+
 export type DebtEntry = {
   id: string;
-  hija: string;
+  account_id: string;
+  hija: string | null;
   kind: "cargo" | "abono";
   amount: number;
   concept: string;

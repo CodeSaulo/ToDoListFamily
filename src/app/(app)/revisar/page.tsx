@@ -44,9 +44,9 @@ export default async function RevisarPage() {
             {pendingDishes.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center gap-2">
-                  <Avatar p={byId.get(e.hija)} />
+                  <Avatar p={byId.get(e.hija ?? "")} />
                   <p className="font-bold">
-                    {displayName(byId.get(e.hija))}{" "}
+                    {displayName(byId.get(e.hija ?? ""))}{" "}
                     <span className={e.amount > 0 ? "text-rose-600" : "text-emerald-600"}>{e.amount > 0 ? `+${e.amount}` : e.amount}</span>
                   </p>
                 </div>
@@ -68,9 +68,9 @@ export default async function RevisarPage() {
             {pendingDebts.map((e) => (
               <li key={e.id} className="py-3">
                 <div className="flex items-center gap-2">
-                  <Avatar p={byId.get(e.hija)} />
+                  <Avatar p={byId.get(e.hija ?? "")} />
                   <p className="font-bold">
-                    {displayName(byId.get(e.hija))} <span className="text-emerald-600">−{money(Number(e.amount))}</span>
+                    {displayName(byId.get(e.hija ?? ""))} <span className="text-emerald-600">−{money(Number(e.amount))}</span>
                   </p>
                 </div>
                 <p className="mt-1 text-sm text-slate-600">

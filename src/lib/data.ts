@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { Announcement, DebtEntry, DishEntry, Handover, Obligation, Profile, TaskInstance } from "@/lib/types";
+import type { Announcement, DebtAccount, DebtEntry, DishEntry, Handover, Obligation, Profile, TaskInstance } from "@/lib/types";
 import { addDays, mondayOf, weekNumber, weekdayOf } from "@/lib/dates";
 
 export const getSession = cache(async () => {
@@ -80,6 +80,18 @@ export async function getDebtEntries(): Promise<DebtEntry[]> {
 
 export function dishBalance(entries: DishEntry[], hija: string): number {
   return entries.filter((e) => e.hija === hija && e.status === "aprobado").reduce((s, e) => s + e.amount, 0);
+}
+
+export async function getDebtAccounts(): Promise<DebtAccount[]> {
+  const { supabase } = await getSession();
+  const { data } = await supabase.from("debt_accounts").select("*").order("created_at");
+  return (data ?? []) as DebtAccount[];
+}
+
+export function accountBalance(entries: DebtEntry[], accountId: string): number {
+  return entries
+    .filter((e) => e.account_id === accountId && e.status === "aprobado")
+    .reduce((s, e) => s + (e.kind === "cargo" ? Number(e.amount) : -Number(e.amount)), 0);
 }
 
 export function debtBalance(entries: DebtEntry[], hija: string): number {
