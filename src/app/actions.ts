@@ -394,3 +394,23 @@ export async function deleteDebtAccount(id: string): Promise<ActionState> {
   const { error } = await supabase.from("debt_accounts").delete().eq("id", id).is("profile_id", null);
   return done(error, "Cuenta borrada");
 }
+
+// ============ Obligaciones Cookie ============
+
+export async function saveCookieShift(_: ActionState, fd: FormData): Promise<ActionState> {
+  const supabase = await createClient();
+  const start = str(fd, "start_time");
+  const end = str(fd, "end_time");
+  if (!str(fd, "label") || !start || !end) return { error: "Falta el nombre o el horario." };
+  const { error } = await supabase
+    .from("cookie_shifts")
+    .update({
+      label: str(fd, "label"),
+      start_time: start,
+      end_time: end,
+      person_name: str(fd, "person_name") || null,
+      tasks: str(fd, "tasks") || null,
+    })
+    .eq("id", str(fd, "id"));
+  return done(error, "Horario guardado");
+}

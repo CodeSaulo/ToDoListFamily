@@ -1,6 +1,7 @@
-import { ChefHat, CookingPot, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
+import { ChefHat, CookingPot, Dog, LogOut, Megaphone, PartyPopper, Plus, StickyNote, Users, Wallet, ChevronRight, ClipboardCheck, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/app/actions";
+import { currentShift, getCookieShifts } from "@/components/CookieCard";
 import { ObligationsCard } from "@/components/ObligationsCard";
 import { TaskCard } from "@/components/TaskCard";
 import { Avatar, Card, Empty, IconTile, IconTitle } from "@/components/ui";
@@ -33,6 +34,7 @@ export default async function Home() {
   const notes = (notesRes.data ?? []) as Note[];
   const { data: mealsData } = await supabase.from("meals").select("*").eq("status", "aceptado").eq("day", today);
   const todayMeals = (mealsData ?? []) as Meal[];
+  const cookieNow = currentShift(await getCookieShifts());
 
   const myTasks = [...overdue, ...instances].filter((i) => i.assignee === me.id);
   const toReview = [...overdue, ...instances].filter((i) => i.status === "para_revisar");
@@ -134,6 +136,19 @@ export default async function Home() {
         </div>
         <ChevronRight size={18} className="text-slate-300" />
       </Link>
+
+      {cookieNow && (
+        <Link href="/tareas" className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 to-amber-500 text-white">
+            <Dog size={22} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-slate-500">Cookie ahorita ({cookieNow.label.toLowerCase()})</p>
+            <p className="font-extrabold">Le toca a {cookieNow.person_name || "nadie asignado"}</p>
+          </div>
+          <ChevronRight size={18} className="text-slate-300" />
+        </Link>
+      )}
 
       <ObligationsCard />
 

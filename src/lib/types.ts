@@ -142,3 +142,13 @@ export type Meal = {
 };
 
 export const SLOT_LABEL: Record<MealSlot, string> = { desayuno: "Desayuno", comida: "Comida", cena: "Cena" };
+
+export type CookieShift = {
+  id: string;
+  label: string;
+  start_time: string;
+  end_time: string;
+  person_name: string | null;
+  tasks: string | null;
+  position: number;
+};

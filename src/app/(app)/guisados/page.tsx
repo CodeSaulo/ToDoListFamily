@@ -11,7 +11,10 @@ const DAYS = 15;
 const SLOT_ORDER: Record<MealSlot, number> = { desayuno: 0, comida: 1, cena: 2 };
 
 export default async function GuisadosPage() {
-  const { supabase, me, isAdmin, byId } = await getSession();
+  const { supabase, me, byId } = await getSession();
+  // Solo la aprobadora (Roxana) acepta, rechaza o acomoda guisados; los demás proponen.
+  const { data: approver } = await supabase.rpc("is_meal_approver");
+  const canApprove = approver === true;
   const today = todayMX();
   const last = addDays(today, DAYS - 1);
   const [{ data: scheduled }, { data: proposed }] = await Promise.all([
@@ -24,7 +27,7 @@ export default async function GuisadosPage() {
 
   return (
     <div className="space-y-4">
-      <PageTitle sub="Lo que vamos a cocinar los próximos 15 días" icon={ChefHat} tone="orange">
+      <PageTitle sub="Todos proponen; Roxana decide qué se cocina" icon={ChefHat} tone="orange">
         Guisados
       </PageTitle>
 
@@ -55,7 +58,7 @@ export default async function GuisadosPage() {
                           <p className="text-sm font-bold leading-tight">{m.title}</p>
                           <p className="text-[11px] text-slate-500">{SLOT_LABEL[m.slot]}</p>
                         </div>
-                        {isAdmin && (
+                        {canApprove && (
                           <ActButton action={unscheduleMeal.bind(null, m.id)} className="text-slate-400 hover:text-slate-600">
                             <Undo2 size={14} />
                           </ActButton>
@@ -74,14 +77,14 @@ export default async function GuisadosPage() {
         <ActionForm action={addMeal}>
           <input name="title" className="input" placeholder="Ej. Tinga de pollo" />
           <input name="notes" className="input" placeholder="Nota o receta (opcional)" />
-          {isAdmin && (
+          {canApprove && (
             <div className="grid grid-cols-2 gap-2">
               <DayPicker days={days} />
               <SlotPicker />
             </div>
           )}
           <SubmitButton className="btn-primary w-full">
-            {isAdmin ? "Guardar (con día queda en el calendario)" : "Proponer"}
+            {canApprove ? "Guardar (con día queda en el calendario)" : "Proponer"}
           </SubmitButton>
         </ActionForm>
       </Card>
@@ -100,13 +103,13 @@ export default async function GuisadosPage() {
                     {m.notes && <p className="text-sm text-slate-600">{m.notes}</p>}
                     <p className="text-xs text-slate-400">Lo propuso {displayName(byId.get(m.proposed_by ?? ""))}</p>
                   </div>
-                  {(isAdmin || m.proposed_by === me.id) && (
+                  {(canApprove || m.proposed_by === me.id) && (
                     <ActButton action={deleteMeal.bind(null, m.id)} className="text-slate-400 hover:text-rose-600" confirm="¿Borrar esta propuesta?">
                       <Trash2 size={15} />
                     </ActButton>
                   )}
                 </div>
-                {isAdmin && (
+                {canApprove && (
                   <ActionForm action={scheduleMeal} className="mt-2 flex flex-wrap items-center gap-2" resetOnOk={false}>
                     <input type="hidden" name="id" value={m.id} />
                     <DayPicker days={days} compact />

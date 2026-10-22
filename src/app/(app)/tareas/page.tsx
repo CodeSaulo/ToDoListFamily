@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, ListChecks, Plus, Settings2 } from "lucide-react";
 import Link from "next/link";
+import { CookieCard } from "@/components/CookieCard";
 import { ObligationsCard } from "@/components/ObligationsCard";
 import { TaskCard } from "@/components/TaskCard";
 import { Avatar, Card, Empty, PageTitle } from "@/components/ui";
@@ -36,6 +37,8 @@ export default async function TareasPage({ searchParams }: { searchParams: Promi
       </div>
 
       <ObligationsCard />
+
+      <CookieCard />
 
       <div className="flex items-center justify-between rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-100">
         <Link href={q(addDays(day, -1))} className="btn-soft"><ChevronLeft size={16} /> Ayer</Link>
