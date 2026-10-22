@@ -6,7 +6,7 @@ import { getSession } from "@/lib/data";
 import { TZ } from "@/lib/dates";
 import type { CookieShift } from "@/lib/types";
 
-const PEOPLE = ["Renata", "Rebeca", "Romina"];
+const PEOPLE = ["Renata", "Rebeka", "Romina"];
 
 /** "07:00:00" → "7:00 am" */
 function hora(t: string) {

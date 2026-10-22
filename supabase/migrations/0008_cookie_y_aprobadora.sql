@@ -19,7 +19,7 @@ insert into public.cookie_shifts (label, start_time, end_time, person_name, posi
 select t.label, t.s::time, t.e::time, t.person, t.position
 from (values
   ('Mañana', '07:00', '10:00', 'Renata', 0),
-  ('Tarde', '14:00', '17:00', 'Rebeca', 1),
+  ('Tarde', '14:00', '17:00', 'Rebeka', 1),
   ('Noche', '19:00', '22:00', 'Romina', 2)
 ) as t (label, s, e, person, position)
 where not exists (select 1 from public.cookie_shifts);
